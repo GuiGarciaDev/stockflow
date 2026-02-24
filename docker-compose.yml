@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: duckstock-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-duckstock}
+      POSTGRES_USER: ${POSTGRES_USER:-duckstock}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-duckstock123}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    restart: unless-stopped

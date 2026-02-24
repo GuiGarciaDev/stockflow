@@ -1,0 +1,24 @@
+#!/bin/sh
+# Maven Wrapper script
+# Auto-downloads Maven if not present
+
+set -e
+
+MAVEN_WRAPPER_PROPERTIES=".mvn/wrapper/maven-wrapper.properties"
+
+if [ -f "$MAVEN_WRAPPER_PROPERTIES" ]; then
+    MAVEN_URL=$(grep 'distributionUrl' "$MAVEN_WRAPPER_PROPERTIES" | cut -d'=' -f2-)
+fi
+
+MAVEN_HOME="${HOME}/.m2/wrapper/dists/apache-maven-3.9.6"
+
+if [ ! -d "$MAVEN_HOME" ]; then
+    echo "Downloading Maven..."
+    mkdir -p "$MAVEN_HOME"
+    curl -fsSL "$MAVEN_URL" -o /tmp/maven.zip
+    unzip -qo /tmp/maven.zip -d "$MAVEN_HOME"
+    rm /tmp/maven.zip
+fi
+
+MAVEN_BIN=$(find "$MAVEN_HOME" -name 'mvn' -type f | head -1)
+exec "$MAVEN_BIN" "$@"

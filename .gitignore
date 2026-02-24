@@ -1,0 +1,46 @@
+# Environment
+.env
+.env.*
+.env.local
+
+# Security
+*.pem
+backend/src/main/resources/application.properties
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+.mvn/wrapper/maven-wrapper.jar
+
+# Node / Bun
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Agent
+.agent/
+
+# AI files
+.ai/
+*.ai
