@@ -1,15 +1,16 @@
 package com.duckstock.resource;
 
-import com.duckstock.dto.auth.LoginRequest;
-import com.duckstock.dto.auth.RegisterRequest;
-import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
-import org.junit.jupiter.api.Test;
-
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import org.junit.jupiter.api.Test;
+
+import com.duckstock.dto.auth.LoginRequest;
+import com.duckstock.dto.auth.RegisterRequest;
+
+import io.quarkus.test.junit.QuarkusTest;
+import static io.restassured.RestAssured.given;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 
 @QuarkusTest
 public class MeEndpointIntegrationTest {
@@ -45,11 +46,11 @@ public class MeEndpointIntegrationTest {
                 .cookie("jwt_token", notNullValue())
                 .extract().response();
 
-        String sessionId = loginResponse.getCookie("jwt_token");
+        String accessToken = loginResponse.path("accessToken");
 
-        // 2. Call /me with the cookie
+        // 2. Call /me with the access token
         given()
-                .cookie("jwt_token", sessionId)
+                .header("Authorization", "Bearer " + accessToken)
                 .when()
                 .get("/auth/me")
                 .then()

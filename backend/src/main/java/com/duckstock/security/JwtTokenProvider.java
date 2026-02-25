@@ -9,13 +9,16 @@ import java.util.Set;
 @ApplicationScoped
 public class JwtTokenProvider {
 
-    @ConfigProperty(name = "smallrye.jwt.new-token.lifespan", defaultValue = "3600")
-    int tokenLifespan;
+    @ConfigProperty(name = "smallrye.jwt.new-token.lifespan", defaultValue = "900") // 15 min
+    int accessLifespan;
+
+    @ConfigProperty(name = "smallrye.jwt.refresh-token.lifespan", defaultValue = "604800") // 7 days
+    int refreshLifespan;
 
     @ConfigProperty(name = "smallrye.jwt.new-token.issuer", defaultValue = "duckstock")
     String issuer;
 
-    public String generateToken(Long userId, String email, String role) {
+    public String generateAccessToken(Long userId, String email, String role) {
         return Jwt.issuer(issuer)
                 .subject(userId.toString())
                 .upn(email)
@@ -23,11 +26,26 @@ public class JwtTokenProvider {
                 .claim("userId", userId)
                 .claim("email", email)
                 .claim("role", role)
-                .expiresIn(Duration.ofSeconds(tokenLifespan))
+                .claim("type", "access")
+                .expiresIn(Duration.ofSeconds(accessLifespan))
                 .sign();
     }
 
-    public int getTokenLifespan() {
-        return tokenLifespan;
+    public String generateRefreshToken(Long userId, String email) {
+        return Jwt.issuer(issuer)
+                .subject(userId.toString())
+                .upn(email)
+                .claim("userId", userId)
+                .claim("type", "refresh")
+                .expiresIn(Duration.ofSeconds(refreshLifespan))
+                .sign();
+    }
+
+    public int getAccessLifespan() {
+        return accessLifespan;
+    }
+
+    public int getRefreshLifespan() {
+        return refreshLifespan;
     }
 }
