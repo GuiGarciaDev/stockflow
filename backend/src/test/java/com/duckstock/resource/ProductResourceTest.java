@@ -48,7 +48,7 @@ public class ProductResourceTest {
 
     @Test
     @Order(2)
-    public void testAssociateRawMaterial() {
+    public void testAssociateRawMaterials() {
         // Create a raw material first
         RawMaterialRequest rmRequest = new RawMaterialRequest();
         rmRequest.name = "Parafuso";
@@ -70,9 +70,11 @@ public class ProductResourceTest {
         assocRequest.rawMaterialId = java.util.UUID.fromString(rawMaterialId);
         assocRequest.quantityNeeded = 20;
 
+        java.util.List<ProductRawMaterialRequest> requests = java.util.Collections.singletonList(assocRequest);
+
         given()
                 .contentType(ContentType.JSON)
-                .body(assocRequest)
+                .body(requests)
                 .when()
                 .post("/products/" + productId + "/raw-materials")
                 .then()

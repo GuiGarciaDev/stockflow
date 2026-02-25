@@ -95,35 +95,38 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductResponse addRawMaterial(UUID productId, ProductRawMaterialRequest request) {
+    public ProductResponse addRawMaterials(UUID productId, List<ProductRawMaterialRequest> requests) {
         Product product = Product.findById(productId);
         if (product == null) {
             throw new ResourceNotFoundException("Product not found with id: " + productId);
         }
 
-        RawMaterial rawMaterial = RawMaterial.findById(request.rawMaterialId);
-        if (rawMaterial == null) {
-            throw new ResourceNotFoundException("Raw material not found with id: " + request.rawMaterialId);
-        }
-
-        // Check if association already exists
-        boolean exists = product.rawMaterials != null && product.rawMaterials.stream()
-                .anyMatch(prm -> prm.rawMaterial.id.equals(request.rawMaterialId));
-        if (exists) {
-            throw new BusinessException("Raw material is already associated with this product");
-        }
-
-        ProductRawMaterial prm = new ProductRawMaterial();
-        prm.product = product;
-        prm.rawMaterial = rawMaterial;
-        prm.quantityNeeded = request.quantityNeeded;
-        prm.persist();
-
-        // Manage bidirectional relationship for immediate visibility in response
         if (product.rawMaterials == null) {
             product.rawMaterials = new java.util.ArrayList<>();
         }
-        product.rawMaterials.add(prm);
+
+        for (ProductRawMaterialRequest request : requests) {
+            RawMaterial rawMaterial = RawMaterial.findById(request.rawMaterialId);
+            if (rawMaterial == null) {
+                throw new ResourceNotFoundException("Raw material not found with id: " + request.rawMaterialId);
+            }
+
+            // Check if association already exists
+            boolean exists = product.rawMaterials.stream()
+                    .anyMatch(prm -> prm.rawMaterial.id.equals(request.rawMaterialId));
+            if (exists) {
+                throw new BusinessException("Raw material " + rawMaterial.name + " is already associated with this product");
+            }
+
+            ProductRawMaterial prm = new ProductRawMaterial();
+            prm.product = product;
+            prm.rawMaterial = rawMaterial;
+            prm.quantityNeeded = request.quantityNeeded;
+            prm.persist();
+
+            // Manage bidirectional relationship for immediate visibility in response
+            product.rawMaterials.add(prm);
+        }
 
         return ProductResponse.from(product);
     }

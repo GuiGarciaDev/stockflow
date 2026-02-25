@@ -64,9 +64,11 @@ public class ProductionResourceTest {
         assocRequest.rawMaterialId = java.util.UUID.fromString(rmId);
         assocRequest.quantityNeeded = 5;
 
+        java.util.List<ProductRawMaterialRequest> requests = java.util.Collections.singletonList(assocRequest);
+
         given()
                 .contentType(ContentType.JSON)
-                .body(assocRequest)
+                .body(requests)
                 .when()
                 .post("/products/" + p1Id + "/raw-materials")
                 .then()

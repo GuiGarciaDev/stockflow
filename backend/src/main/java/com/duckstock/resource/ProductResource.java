@@ -14,6 +14,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import java.util.List;
 import java.util.UUID;
 
 @Path("/products")
@@ -92,10 +93,10 @@ public class ProductResource {
 
     @POST
     @Path("/{id}/raw-materials")
-    @Operation(summary = "Add a raw material to a product")
-    public Response addRawMaterial(@PathParam("id") UUID id,
-                                    @Valid ProductRawMaterialRequest request) {
-        ProductResponse product = productService.addRawMaterial(id, request);
+    @Operation(summary = "Add multiple raw materials to a product")
+    public Response addRawMaterials(@PathParam("id") UUID id,
+                                     @Valid List<ProductRawMaterialRequest> requests) {
+        ProductResponse product = productService.addRawMaterials(id, requests);
         return Response.status(Response.Status.CREATED).entity(product).build();
     }
 
