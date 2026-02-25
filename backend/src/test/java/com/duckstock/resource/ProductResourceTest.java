@@ -143,4 +143,49 @@ public class ProductResourceTest {
                 .body("price", is(75.0f))
                 .body("stockQuantity", is(5));
     }
+
+    @Test
+    public void testCreateProductWithRawMaterials() {
+        // 1. Create a raw material first
+        RawMaterialRequest rmRequest = new RawMaterialRequest();
+        rmRequest.name = "Perna de Madeira";
+        rmRequest.price = new BigDecimal("15.00");
+        rmRequest.stockQuantity = 500;
+        rmRequest.unit = "un";
+
+        String rmId = given()
+                .contentType(ContentType.JSON)
+                .body(rmRequest)
+                .when()
+                .post("/raw-materials")
+                .then()
+                .statusCode(201)
+                .extract()
+                .path("id");
+
+        // 2. Create product with raw materials
+        ProductRequest productRequest = new ProductRequest();
+        productRequest.name = "Cadeira de Luxo";
+        productRequest.description = "Cadeira muito confortável";
+        productRequest.price = new BigDecimal("250.00");
+        productRequest.stockQuantity = 50;
+
+        ProductRawMaterialRequest assocRequest = new ProductRawMaterialRequest();
+        assocRequest.rawMaterialId = java.util.UUID.fromString(rmId);
+        assocRequest.quantityNeeded = 4;
+
+        productRequest.rawMaterials = java.util.Collections.singletonList(assocRequest);
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(productRequest)
+                .when()
+                .post("/products")
+                .then()
+                .statusCode(201)
+                .body("name", is("Cadeira de Luxo"))
+                .body("rawMaterials.size()", is(1))
+                .body("rawMaterials[0].rawMaterialName", is("Perna de Madeira"))
+                .body("rawMaterials[0].quantityNeeded", is(4));
+    }
 }

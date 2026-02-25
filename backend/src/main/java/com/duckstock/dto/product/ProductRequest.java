@@ -1,7 +1,9 @@
 package com.duckstock.dto.product;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
+import java.util.List;
 
 public class ProductRequest {
 
@@ -16,4 +18,7 @@ public class ProductRequest {
 
     @Min(value = 0, message = "Stock cannot be negative")
     public Integer stockQuantity;
+
+    @Valid
+    public List<ProductRawMaterialRequest> rawMaterials;
 }

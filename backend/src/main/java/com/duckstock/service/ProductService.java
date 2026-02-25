@@ -58,6 +58,11 @@ public class ProductService {
         product.price = request.price;
         product.stockQuantity = request.stockQuantity;
         product.persist();
+
+        if (request.rawMaterials != null && !request.rawMaterials.isEmpty()) {
+            internalAddRawMaterials(product, request.rawMaterials);
+        }
+
         return ProductResponse.from(product);
     }
 
@@ -101,6 +106,12 @@ public class ProductService {
             throw new ResourceNotFoundException("Product not found with id: " + productId);
         }
 
+        internalAddRawMaterials(product, requests);
+
+        return ProductResponse.from(product);
+    }
+
+    private void internalAddRawMaterials(Product product, List<ProductRawMaterialRequest> requests) {
         if (product.rawMaterials == null) {
             product.rawMaterials = new java.util.ArrayList<>();
         }
@@ -127,8 +138,6 @@ public class ProductService {
             // Manage bidirectional relationship for immediate visibility in response
             product.rawMaterials.add(prm);
         }
-
-        return ProductResponse.from(product);
     }
 
     @Transactional
