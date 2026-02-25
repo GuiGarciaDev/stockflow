@@ -1,75 +1,84 @@
-import api from "../api/axios";
+import { api } from "@/services/api"
+import type { PageResponse } from "@/services/types"
 
-export interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  stockQuantity: number;
-  rawMaterials: RawMaterialAssociation[];
-  createdAt: string;
-  updatedAt: string;
+export type ProductRawMaterialAssociation = {
+  id: string
+  rawMaterialId: string
+  rawMaterialName: string
+  quantityNeeded: number
 }
 
-export interface RawMaterialAssociation {
-  id: string;
-  rawMaterialId: string;
-  rawMaterialName: string;
-  quantityNeeded: number;
+export type Product = {
+  id: string
+  name: string
+  description?: string | null
+  price: number
+  stockQuantity: number
+  rawMaterials?: ProductRawMaterialAssociation[]
+  createdAt: string
+  updatedAt: string
 }
 
-export interface ProductRequest {
-  name: string;
-  description: string;
-  price: number;
-  stockQuantity: number;
+export type ProductRequest = {
+  name: string
+  description?: string
+  price: number
+  stockQuantity: number
 }
 
-export interface ProductRawMaterialRequest {
-  rawMaterialId: string;
-  quantityNeeded: number;
-}
-
-export interface PageResponse<T> {
-  content: T[];
-  page: number;
-  size: number;
-  totalElements: number;
-  totalPages: number;
-  first: boolean;
-  last: boolean;
+export type ProductRawMaterialRequest = {
+  rawMaterialId: string
+  quantityNeeded: number
 }
 
 export const productService = {
-  list: (page = 0, size = 10, search?: string) =>
-    api.get<PageResponse<Product>>("/products", {
-      params: { page, size, search },
-    }),
-
-  getById: (id: string) => api.get<Product>(`/products/${id}`),
-
-  create: (data: ProductRequest) => api.post<Product>("/products", data),
-
-  update: (id: string, data: ProductRequest) =>
-    api.put<Product>(`/products/${id}`, data),
-
-  delete: (id: string) => api.delete(`/products/${id}`),
-
-  addRawMaterial: (productId: string, data: ProductRawMaterialRequest) =>
-    api.post<Product>(`/products/${productId}/raw-materials`, data),
-
-  removeRawMaterial: (productId: string, associationId: string) =>
-    api.delete<Product>(
-      `/products/${productId}/raw-materials/${associationId}`,
-    ),
-
-  updateRawMaterialQty: (
+  async list(params: { page: number; size: number; search?: string | null }) {
+    const res = await api.get<PageResponse<Product>>("/products", {
+      params: {
+        page: params.page,
+        size: params.size,
+        search: params.search || undefined,
+      },
+    })
+    return res.data
+  },
+  async get(id: string) {
+    const res = await api.get<Product>(`/products/${id}`)
+    return res.data
+  },
+  async create(body: ProductRequest) {
+    const res = await api.post<Product>("/products", body)
+    return res.data
+  },
+  async update(id: string, body: ProductRequest) {
+    const res = await api.put<Product>(`/products/${id}`, body)
+    return res.data
+  },
+  async remove(id: string) {
+    await api.delete(`/products/${id}`)
+  },
+  async addRawMaterial(productId: string, body: ProductRawMaterialRequest) {
+    const res = await api.post<Product>(
+      `/products/${productId}/raw-materials`,
+      [body],
+    )
+    return res.data
+  },
+  async updateRawMaterial(
     productId: string,
     associationId: string,
-    data: ProductRawMaterialRequest,
-  ) =>
-    api.put<Product>(
+    body: ProductRawMaterialRequest,
+  ) {
+    const res = await api.put<Product>(
       `/products/${productId}/raw-materials/${associationId}`,
-      data,
-    ),
-};
+      body,
+    )
+    return res.data
+  },
+  async removeRawMaterial(productId: string, associationId: string) {
+    const res = await api.delete<Product>(
+      `/products/${productId}/raw-materials/${associationId}`,
+    )
+    return res.data
+  },
+}
