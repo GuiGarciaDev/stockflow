@@ -1,5 +1,5 @@
 {
-  "name": "fabrika360-frontend",
+  "name": "stockflow-frontend",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@iconify/react": "^6.0.2",
     "@reduxjs/toolkit": "^2.2.3",
     "@tanstack/react-query": "^5.59.0",
     "axios": "^1.7.9",
@@ -20,10 +21,10 @@
     "react-router-dom": "^6.26.2"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.3",
     "@types/node": "^22.10.2",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
+    "@vitejs/plugin-react": "^4.3.3",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",

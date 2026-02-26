@@ -64,6 +64,16 @@ export const productService = {
     )
     return res.data
   },
+  async addRawMaterials(
+    productId: string,
+    bodies: ProductRawMaterialRequest[],
+  ) {
+    const res = await api.post<Product>(
+      `/products/${productId}/raw-materials`,
+      bodies,
+    )
+    return res.data
+  },
   async updateRawMaterial(
     productId: string,
     associationId: string,

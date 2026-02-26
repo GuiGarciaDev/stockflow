@@ -8,5 +8,37 @@ body {
 }
 
 body {
-  @apply bg-slate-50 text-slate-900;
+  @apply bg-[#0a0a0a] text-white;
+}
+
+@layer utilities {
+  .gradient-text {
+    @apply bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent;
+  }
+
+  .glass-card {
+    @apply border border-white/5 bg-white/[0.02] backdrop-blur-md;
+  }
+
+  .glow-on-hover {
+    @apply hover:border-emerald-500/20;
+  }
+
+  .sidebar-link {
+    @apply text-neutral-400 hover:text-white hover:bg-white/5;
+  }
+
+  .sidebar-link.active {
+    @apply text-white bg-emerald-500/10 border border-emerald-500/20;
+  }
+
+  .input-field {
+    @apply bg-neutral-900/50 border border-white/5 text-white placeholder-neutral-600 outline-none transition-all;
+    @apply focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500;
+  }
+
+  select.input-field option,
+  select.input-field optgroup {
+    @apply bg-neutral-900 text-white;
+  }
 }

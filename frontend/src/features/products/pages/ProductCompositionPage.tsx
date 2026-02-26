@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { Skeleton } from "@/components/ui/Skeleton"
+import { DropdownSelect } from "@/components/DropdownSelect"
 import { apiErrorMessage } from "@/services/errors"
 import { productService } from "@/services/productService"
 import { rawMaterialService } from "@/services/rawMaterialService"
@@ -125,23 +126,21 @@ export default function ProductCompositionPage() {
           ) : (
             <form className="space-y-3" onSubmit={onSubmit}>
               <div>
-                <label className="block text-sm font-medium text-slate-700">
+                <label className="block text-xs font-bold text-neutral-400 uppercase tracking-widest">
                   Raw Material
                 </label>
-                <select
-                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-400 disabled:bg-slate-100"
-                  value={rawMaterialId}
-                  onChange={(e) => setRawMaterialId(e.target.value)}
-                  disabled={addMutation.isPending}
-                  required
-                >
-                  <option value="">Select…</option>
-                  {availableOptions.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="mt-2">
+                  <DropdownSelect
+                    value={rawMaterialId}
+                    onChange={setRawMaterialId}
+                    disabled={addMutation.isPending}
+                    placeholder="Select..."
+                    options={availableOptions.map((m) => ({
+                      value: m.id,
+                      label: m.name,
+                    }))}
+                  />
+                </div>
               </div>
               <Input
                 label="Quantity needed"
