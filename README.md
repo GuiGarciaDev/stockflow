@@ -10,13 +10,14 @@ DuckStock is a Manufacturing Production Planner: manage raw materials, build pro
 - **Production suggestions** driven by available stock (highest-value products first)
 - **Swagger UI** for API exploration
 
-## Screenshots (drop your images here)
+## Screenshots
+<img width="1900" height="880" alt="image" src="https://github.com/user-attachments/assets/35c6885f-dbee-4b61-8ae2-d2313cd197fd" />
 
-Add screenshots under `docs/images/` and link them like:
+<img width="1900" height="876" alt="image" src="https://github.com/user-attachments/assets/0a2996f4-5bb1-490f-99ed-fca1c729fc84" />
 
-- `![Dashboard](docs/images/dashboard.png)`
-- `![Production](docs/images/production.png)`
-- `![Products](docs/images/products.png)`
+<img width="1901" height="880" alt="image" src="https://github.com/user-attachments/assets/96b07dae-6027-4a61-8a69-1fe3a84ae3e2" />
+
+<img width="1900" height="873" alt="image" src="https://github.com/user-attachments/assets/f4cc6365-dc17-4ff9-b7fe-59bdb3a50c87" />
 
 ## Repository Structure
 
