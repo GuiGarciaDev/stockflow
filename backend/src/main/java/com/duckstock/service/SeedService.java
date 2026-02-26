@@ -1,18 +1,26 @@
 package com.duckstock.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+
+import org.jboss.logging.Logger;
+
 import com.duckstock.entity.Product;
 import com.duckstock.entity.ProductRawMaterial;
 import com.duckstock.entity.RawMaterial;
 import com.duckstock.entity.User;
 import com.duckstock.security.PasswordEncoder;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import org.jboss.logging.Logger;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
 
 @ApplicationScoped
 public class SeedService {
@@ -61,6 +69,30 @@ public class SeedService {
 
     @Transactional
     public Map<String, Object> seed() {
+        return seedWithUsers(
+            "admin@duckstock.com",
+            "admin123",
+            "user@duckstock.com",
+            "user123"
+        );
+        }
+
+        @Transactional
+        public Map<String, Object> seedWithAdmin(String adminEmail, String adminPassword) {
+        return seedWithUsers(
+            adminEmail,
+            adminPassword,
+            "user@duckstock.com",
+            "user123"
+        );
+        }
+
+        private Map<String, Object> seedWithUsers(
+            String adminEmail,
+            String adminPassword,
+            String userEmail,
+            String userPassword
+        ) {
         LOG.info("Starting database seed...");
 
         // Clear existing data
@@ -74,16 +106,16 @@ public class SeedService {
         // Create admin user
         User admin = new User();
         admin.name = "Admin DuckStock";
-        admin.email = "admin@duckstock.com";
-        admin.password = passwordEncoder.encode("admin123");
+        admin.email = adminEmail;
+        admin.password = passwordEncoder.encode(adminPassword);
         admin.role = "ADMIN";
         admin.persist();
 
         // Create regular user
         User user = new User();
         user.name = "User DuckStock";
-        user.email = "user@duckstock.com";
-        user.password = passwordEncoder.encode("user123");
+        user.email = userEmail;
+        user.password = passwordEncoder.encode(userPassword);
         user.role = "USER";
         user.persist();
 

@@ -20,6 +20,16 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           position="top-right"
           toastOptions={{
             duration: 4000,
+            className:
+              "glass-card !bg-neutral-950 !border-white/10 !text-neutral-100 !rounded-xl !px-4 !py-3 text-sm",
+            success: {
+              className:
+                "glass-card !bg-neutral-950 !border-emerald-500/20 !text-neutral-100 !rounded-xl !px-4 !py-3 text-sm",
+            },
+            error: {
+              className:
+                "glass-card !bg-neutral-950 !border-red-500/20 !text-neutral-100 !rounded-xl !px-4 !py-3 text-sm",
+            },
           }}
         />
       </QueryClientProvider>

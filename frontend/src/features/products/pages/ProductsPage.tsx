@@ -67,6 +67,7 @@ export default function ProductsPage() {
   const [compositionQtyByMaterialId, setCompositionQtyByMaterialId] = useState<
     Record<string, string>
   >({})
+  const [compositionSearch, setCompositionSearch] = useState("")
 
   const [syncingComposition, setSyncingComposition] = useState(false)
 
@@ -346,6 +347,7 @@ export default function ProductsPage() {
       setStockQuantity("")
       setCompositionOpen(false)
       setCompositionQtyByMaterialId({})
+      setCompositionSearch("")
     }
   }
 
@@ -368,6 +370,13 @@ export default function ProductsPage() {
     return materialsQuery.data ?? []
   }, [materialsQuery.data])
 
+  const compositionFilteredMaterials = useMemo(() => {
+    const list = compositionMaterials
+    const term = compositionSearch.trim().toLowerCase()
+    if (!term) return list
+    return list.filter((m) => m.name.toLowerCase().includes(term))
+  }, [compositionMaterials, compositionSearch])
+
   const isBusy =
     saving ||
     deleteMutation.isPending ||
@@ -382,6 +391,7 @@ export default function ProductsPage() {
     setStockQuantity("")
     setCompositionOpen(false)
     setCompositionQtyByMaterialId({})
+    setCompositionSearch("")
   }
 
   function openLinkModal(product: Product) {
@@ -538,6 +548,20 @@ export default function ProductsPage() {
                       product unit.
                     </p>
 
+                    <div className="relative">
+                      <Icon
+                        icon="lucide:search"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600"
+                      />
+                      <input
+                        type="text"
+                        className="w-full pl-9 pr-3 py-2 rounded-xl input-field text-sm"
+                        placeholder="Search raw materials..."
+                        value={compositionSearch}
+                        onChange={(e) => setCompositionSearch(e.target.value)}
+                      />
+                    </div>
+
                     {materialsQuery.isLoading ? (
                       <div className="space-y-2">
                         <div className="h-12 rounded-lg bg-white/[0.03] border border-white/5 animate-pulse" />
@@ -549,65 +573,78 @@ export default function ProductsPage() {
                         Failed to load raw materials.
                       </div>
                     ) : (
-                      <div className="space-y-2">
-                        {compositionMaterials.map((m: RawMaterial) => {
-                          const qtyRaw = compositionQtyByMaterialId[m.id] ?? ""
-                          const qty = clampInt(qtyRaw)
-                          const isSelected = qty != null && qty > 0
+                      <div className="max-h-[52vh] overflow-y-auto scrollbar-app rounded-xl border border-white/5 p-2 pr-1">
+                        <div className="space-y-2">
+                          {compositionFilteredMaterials.map(
+                            (m: RawMaterial) => {
+                              const qtyRaw =
+                                compositionQtyByMaterialId[m.id] ?? ""
+                              const qty = clampInt(qtyRaw)
+                              const isSelected = qty != null && qty > 0
 
-                          return (
-                            <div
-                              key={m.id}
-                              className={[
-                                "flex items-center justify-between p-3 rounded-lg border group transition-colors",
-                                isSelected
-                                  ? "bg-emerald-500/5 border-emerald-500/20"
-                                  : "bg-white/[0.03] border-white/5",
-                              ].join(" ")}
-                            >
-                              <div className="flex items-center gap-3">
-                                <Icon
-                                  icon="lucide:circle"
-                                  className={
-                                    isSelected
-                                      ? "text-[10px] text-emerald-500"
-                                      : "text-[10px] text-emerald-500/40 group-hover:text-emerald-500"
-                                  }
-                                />
-                                <div>
-                                  <p className="text-sm font-semibold">
-                                    {m.name}
-                                  </p>
-                                  <p className="text-[10px] text-neutral-500">
-                                    Available: {m.stockQuantity} {m.unit}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <span className="text-[10px] text-neutral-500 font-bold uppercase">
-                                  Qty:
-                                </span>
-                                <input
-                                  type="number"
+                              return (
+                                <div
+                                  key={m.id}
                                   className={[
-                                    "w-20 px-3 py-1.5 rounded-lg bg-black/40 border text-xs text-white outline-none",
+                                    "flex items-center justify-between p-3 rounded-lg border group transition-colors",
                                     isSelected
-                                      ? "border-emerald-500/40 focus:border-emerald-500"
-                                      : "border-white/10 focus:border-emerald-500",
+                                      ? "bg-emerald-500/5 border-emerald-500/20"
+                                      : "bg-white/[0.03] border-white/5",
                                   ].join(" ")}
-                                  placeholder="0"
-                                  value={qtyRaw}
-                                  onChange={(e) =>
-                                    setCompositionQtyByMaterialId((prev) => ({
-                                      ...prev,
-                                      [m.id]: e.target.value,
-                                    }))
-                                  }
-                                />
-                              </div>
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <Icon
+                                      icon="lucide:circle"
+                                      className={
+                                        isSelected
+                                          ? "text-[10px] text-emerald-500"
+                                          : "text-[10px] text-emerald-500/40 group-hover:text-emerald-500"
+                                      }
+                                    />
+                                    <div>
+                                      <p className="text-sm font-semibold">
+                                        {m.name}
+                                      </p>
+                                      <p className="text-[10px] text-neutral-500">
+                                        Available: {m.stockQuantity} {m.unit}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-[10px] text-neutral-500 font-bold uppercase">
+                                      Qty:
+                                    </span>
+                                    <input
+                                      type="number"
+                                      className={[
+                                        "w-20 px-3 py-1.5 rounded-lg bg-black/40 border text-xs text-white outline-none",
+                                        isSelected
+                                          ? "border-emerald-500/40 focus:border-emerald-500"
+                                          : "border-white/10 focus:border-emerald-500",
+                                      ].join(" ")}
+                                      placeholder="0"
+                                      value={qtyRaw}
+                                      onChange={(e) =>
+                                        setCompositionQtyByMaterialId(
+                                          (prev) => ({
+                                            ...prev,
+                                            [m.id]: e.target.value,
+                                          }),
+                                        )
+                                      }
+                                    />
+                                  </div>
+                                </div>
+                              )
+                            },
+                          )}
+
+                          {compositionFilteredMaterials.length === 0 ? (
+                            <div className="py-8 text-center text-xs text-neutral-500">
+                              No raw materials match your search.
                             </div>
-                          )
-                        })}
+                          ) : null}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -912,7 +949,7 @@ export default function ProductsPage() {
                   Failed to load raw materials.
                 </div>
               ) : (
-                <div className="max-h-[52vh] overflow-auto rounded-xl border border-white/5">
+                <div className="max-h-[52vh] overflow-auto scrollbar-app rounded-xl border border-white/5 pr-1">
                   <div className="divide-y divide-white/[0.03]">
                     {modalFilteredMaterials.map((m) => {
                       const qtyRaw =

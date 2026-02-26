@@ -40,3 +40,10 @@ quarkus.http.port=${QUARKUS_HTTP_PORT:8080}
 quarkus.log.console.enable=true
 quarkus.log.console.level=INFO
 quarkus.log.category."com.duckstock".level=DEBUG
+
+# Dev bootstrap (NEVER runs in production)
+# When enabled and running with profile dev, it will create a default ADMIN user
+# and run the database seed on startup.
+%dev.duckstock.dev-bootstrap.enabled=${DEV_BOOTSTRAP_ENABLED:false}
+%dev.duckstock.dev-bootstrap.admin.email=${DEV_BOOTSTRAP_ADMIN_EMAIL:test@gmail.com}
+%dev.duckstock.dev-bootstrap.admin.password=${DEV_BOOTSTRAP_ADMIN_PASSWORD:123456}
