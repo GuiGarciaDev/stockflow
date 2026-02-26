@@ -1,52 +1,77 @@
-# DuckStock 🦆📈
+# DuckStock
 
-DuckStock is a Manufacturing Production Planner application designed to help small to mid-sized manufacturing businesses manage their raw materials, products, and production flow efficiently.
+DuckStock is a Manufacturing Production Planner: manage raw materials, build product compositions (BOM), and generate production suggestions based on current inventory.
 
-## Project Structure
+## What you get
 
-- `backend/`: Java Quarkus application providing a RESTful API.
-- `frontend/`: React + Vite application (built with Bun) for the user interface.
-- `docker-compose.yml`: Local infrastructure setup (PostgreSQL).
+- **Authentication** with access tokens + refresh cookie
+- **Raw materials** CRUD + stock tracking
+- **Products** CRUD + composition management (product ↔ raw materials)
+- **Production suggestions** driven by available stock (highest-value products first)
+- **Swagger UI** for API exploration
+
+## Screenshots (drop your images here)
+
+Add screenshots under `docs/images/` and link them like:
+
+- `![Dashboard](docs/images/dashboard.png)`
+- `![Production](docs/images/production.png)`
+- `![Products](docs/images/products.png)`
+
+## Repository Structure
+
+- `backend/`: Quarkus (Java) REST API
+- `frontend/`: React + Vite UI
+- `backend/docker-compose.yml`: Postgres database for backend runs
 
 ## Prerequisites
 
-Before building and running the application, ensure you have the following installed:
+- Java 17+
+- Node.js 18+
+- Docker Desktop
 
-- **Java JDK 17+** (for the backend)
-- **Bun** or **Node.js** (for the frontend)
-- **Docker & Docker Compose** (for the database)
-- **Maven** (optional, `mvnw` wrapper included in backend)
+## Quick Start (Local)
 
-## Quick Start
+### 1) Start Postgres (backend)
 
-1. **Clone the repository:**
+```bash
+cd backend
+copy .env.example .env
+docker compose up -d
+```
 
-   ```bash
-   git clone <repository-url>
-   cd duck-stock
-   ```
+### 2) Run the backend (dev profile)
 
-2. **Setup Environment Variables:**
-   Copy `.env.example` to `.env` (if applicable) or use the defaults provided in the subdirectories.
+```bash
+cd backend
+./mvnw.cmd quarkus:dev
+```
 
-3. **Start the Infrastructure:**
+Backend: `http://localhost:8080`
 
-   ```bash
-   docker-compose up -d
-   ```
+Swagger UI: `http://localhost:8080/q/swagger-ui`
 
-4. **Run the Backend:**
+### 3) Run the frontend
 
-   ```bash
-   cd backend
-   ./mvnw.cmd quarkus:dev
-   ```
+```bash
+cd frontend
+copy .env.example .env
+npm install
+npm run dev
+```
 
-5. **Run the Frontend:**
-   ```bash
-   cd frontend
-   bun install
-   bun run dev
-   ```
+Frontend: `http://localhost:5173`
 
-Refer to the specific README files in `backend/` and `frontend/` for more detailed instructions.
+## Running “Production Profile” locally (uses the same Compose DB)
+
+```bash
+cd backend
+docker compose up -d
+./mvnw.cmd package
+java -Dquarkus.profile=prod -jar target/quarkus-app/quarkus-run.jar
+```
+
+## More documentation
+
+- Backend details: see `backend/README.md`
+- Frontend details: see `frontend/README.md`

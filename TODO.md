@@ -2,7 +2,8 @@ BACKEND:
 [x] integration tests for resource layer.
 [x] rate limiting.
 [x] configure cors to use environment variables(frontend url, etc).
-[] Create a config in the properties that will create a default admin user and seed the database.
+[x] Create a config in the properties that will create a default admin user and seed the database.
+[x] Move docker-compose file from root to backend folder. This file only run the prod database.
 
 [] Modify the endpoint /production/confirm to be a endpoint that will create a new product based in their raw material quantity available.
 
@@ -30,8 +31,11 @@ FRONTEND:
 [x] Create a search to allow the user search for raw materials in the raw material list composition component.
 [x] Change the production page to a professional design
 [x] Change the design of the notification dropdown to be more elegant and modern.
+[x] Create a README.md for the frontend and another for the backend
+[x] Update the global README.md file
 
-[] Create a README.md for the frontend and another for the backend
-[] Update the global README.md file
+[] Make the left sidebar hideable for small screens
 
-[] Translate the entire frontend to brazilian portuguese
+[] Add unit tests.
+[] Add cypress integration tests.
+[] Translate the entire frontend to brazilian portuguese(optional)

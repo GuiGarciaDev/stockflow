@@ -4,19 +4,25 @@ quarkus.application.name=duckstock-backend
 # Database
 # Use environment variables for sensitive data or local development
 quarkus.datasource.db-kind=postgresql
+%dev.quarkus.datasource.username=${POSTGRES_USER:your_user}
+%dev.quarkus.datasource.password=${POSTGRES_PASSWORD:your_password}
+%dev.quarkus.datasource.jdbc.url=jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:duckstock}
 %prod.quarkus.datasource.username=${POSTGRES_USER:your_user}
 %prod.quarkus.datasource.password=${POSTGRES_PASSWORD:your_password}
 %prod.quarkus.datasource.jdbc.url=jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:duckstock}
 
 # Hibernate
-quarkus.hibernate-orm.database.generation=update
+%dev.quarkus.hibernate-orm.database.generation=drop-and-create
+%test.quarkus.hibernate-orm.database.generation=drop-and-create
+%prod.quarkus.hibernate-orm.database.generation=update
 quarkus.hibernate-orm.log.sql=false
 
 # JWT
 mp.jwt.verify.publickey.location=publicKey.pem
 mp.jwt.verify.issuer=duckstock
 smallrye.jwt.sign.key.location=privateKey.pem
-smallrye.jwt.new-token.lifespan=${JWT_EXPIRATION:3600}
+smallrye.jwt.new-token.lifespan=${JWT_ACCESS_EXPIRATION:900}
+smallrye.jwt.refresh-token.lifespan=${JWT_REFRESH_EXPIRATION:604800}
 smallrye.jwt.new-token.issuer=duckstock
 
 # CORS
