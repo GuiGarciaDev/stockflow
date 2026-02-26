@@ -1,11 +1,10 @@
 package com.duckstock.resource;
 
-import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 
+import io.quarkus.test.junit.QuarkusTest;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.is;
+import io.restassured.http.ContentType;
 
 @QuarkusTest
 public class LoginValidationReproductionTest {

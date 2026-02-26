@@ -1,22 +1,22 @@
 package com.duckstock.resource;
 
-import com.duckstock.dto.auth.LoginRequest;
-import com.duckstock.dto.auth.RegisterRequest;
-import com.duckstock.dto.product.ProductRequest;
-import com.duckstock.dto.product.ProductRawMaterialRequest;
-import com.duckstock.dto.rawmaterial.RawMaterialRequest;
-import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.security.TestSecurity;
-import io.restassured.http.ContentType;
 import java.math.BigDecimal;
+
+import static org.hamcrest.Matchers.greaterThan;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import com.duckstock.dto.auth.RegisterRequest;
+import com.duckstock.dto.product.ProductRawMaterialRequest;
+import com.duckstock.dto.product.ProductRequest;
+import com.duckstock.dto.rawmaterial.RawMaterialRequest;
+
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.greaterThan;
+import io.restassured.http.ContentType;
 
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
