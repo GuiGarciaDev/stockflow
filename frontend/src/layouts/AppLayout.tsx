@@ -185,6 +185,7 @@ export function AppLayout() {
                     <Icon
                       icon="lucide:bell"
                       className="text-xl text-neutral-400 hover:text-white transition-colors"
+                      style={notificationsOpen ? { color: "#10b981" } : {}}
                     />
                     {hasNotifications ? (
                       <span className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-500 rounded-full border-2 border-[#0a0a0a]"></span>
@@ -199,7 +200,7 @@ export function AppLayout() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -6 }}
                         transition={{ duration: 0.12 }}
-                        className="absolute right-0 mt-3 w-[360px] rounded-2xl border border-white/10 overflow-hidden bg-neutral-900 shadow-2xl z-[60]"
+                        className="absolute right-0 mt-3 w-[320px] rounded-2xl border border-white/10 overflow-hidden bg-neutral-900 shadow-2xl z-[60]"
                         role="menu"
                         aria-label="Notifications"
                       >
@@ -242,12 +243,10 @@ export function AppLayout() {
                               ))}
                             </div>
                           ) : (
-                            <div className="p-5">
-                              <div className="rounded-xl border border-white/10 bg-neutral-950 p-4">
-                                <p className="text-sm text-neutral-200 font-semibold">
-                                  No notifications yet
-                                </p>
-                              </div>
+                            <div className="flex justify-center p-5">
+                              <p className="text-sm text-neutral-200 font-semibold">
+                                No notifications yet
+                              </p>
                             </div>
                           )}
                         </div>
