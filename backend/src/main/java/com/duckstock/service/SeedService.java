@@ -70,9 +70,9 @@ public class SeedService {
     @Transactional
     public Map<String, Object> seed() {
         return seedWithUsers(
-            "admin@duckstock.com",
+            "admin@stockflow.com",
             "admin123",
-            "user@duckstock.com",
+            "user@stockflow.com",
             "user123"
         );
         }
@@ -82,7 +82,7 @@ public class SeedService {
         return seedWithUsers(
             adminEmail,
             adminPassword,
-            "user@duckstock.com",
+            "user@stockflow.com",
             "user123"
         );
         }
@@ -105,7 +105,7 @@ public class SeedService {
 
         // Create admin user
         User admin = new User();
-        admin.name = "Admin DuckStock";
+        admin.name = "Admin StockFlow";
         admin.email = adminEmail;
         admin.password = passwordEncoder.encode(adminPassword);
         admin.role = "ADMIN";
@@ -113,7 +113,7 @@ public class SeedService {
 
         // Create regular user
         User user = new User();
-        user.name = "User DuckStock";
+        user.name = "User StockFlow";
         user.email = userEmail;
         user.password = passwordEncoder.encode(userPassword);
         user.role = "USER";

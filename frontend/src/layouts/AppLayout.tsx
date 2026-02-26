@@ -28,6 +28,7 @@ export function AppLayout() {
   const location = useLocation()
   const auth = useAppSelector(selectAuth)
 
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const notificationsRef = useRef<HTMLDivElement | null>(null)
 
@@ -65,10 +66,29 @@ export function AppLayout() {
     }
   }, [notificationsOpen])
 
+  useEffect(() => {
+    setSidebarOpen(false)
+    setNotificationsOpen(false)
+  }, [location.pathname])
+
   return (
     <div className="min-h-screen flex bg-[#0a0a0a] text-white">
-      <aside className="w-72 border-r border-white/5 flex flex-col fixed inset-y-0 z-50 bg-[#070707]">
-        <div className="p-8">
+      {sidebarOpen ? (
+        <div
+          className="fixed inset-0 bg-black/60 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      ) : null}
+
+      <aside
+        className={[
+          "w-72 border-r border-white/5 flex flex-col fixed inset-y-0 left-0 z-50 bg-[#070707] transform transition-transform duration-200",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full",
+          "lg:translate-x-0",
+        ].join(" ")}
+      >
+        <div className="p-8 flex items-start justify-between gap-4">
           <NavLink to="/dashboard" className="flex flex-col gap-1 group">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform">
@@ -82,6 +102,15 @@ export function AppLayout() {
               Production Planner
             </span>
           </NavLink>
+
+          <button
+            type="button"
+            className="p-2 rounded-xl border border-white/5 text-neutral-400 hover:text-white hover:bg-white/10 transition-all lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close sidebar"
+          >
+            <Icon icon="lucide:x" className="text-base" />
+          </button>
         </div>
 
         <nav className="flex-1 px-4 space-y-1">
@@ -133,9 +162,17 @@ export function AppLayout() {
         </div>
       </aside>
 
-      <main className="flex-1 ml-72 flex flex-col min-h-screen">
-        <header className="h-20 border-b border-white/5 flex items-center justify-between px-10 sticky top-0 bg-[#0a0a0a]/80 backdrop-blur-md z-40">
+      <main className="flex-1 ml-0 lg:ml-72 flex flex-col min-h-screen">
+        <header className="h-20 border-b border-white/5 flex items-center justify-between px-4 sm:px-6 lg:px-10 sticky top-0 bg-[#0a0a0a]/80 backdrop-blur-md z-40">
           <div className="flex items-center gap-2 text-sm text-neutral-500">
+            <button
+              type="button"
+              className="p-2 -ml-2 rounded-xl hover:bg-white/5 text-neutral-400 hover:text-white transition-colors lg:hidden"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open sidebar"
+            >
+              <Icon icon="lucide:menu" className="text-xl" />
+            </button>
             <span className="hover:text-neutral-300 transition-colors cursor-pointer">
               Planner
             </span>
@@ -255,7 +292,10 @@ export function AppLayout() {
                   </AnimatePresence>
                 </div>
                 <div className="h-8 w-[1px] bg-white/5 mx-2"></div>
-                <button className="flex items-center gap-2 bg-emerald-500 text-black px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-400 transition-all">
+                <button
+                  className="flex items-center gap-2 bg-emerald-500 text-black px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-400 transition-all"
+                  onClick={() => navigate("/production")}
+                >
                   <Icon icon="lucide:plus" className="text-lg" />
                   New Batch
                 </button>

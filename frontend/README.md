@@ -1,6 +1,6 @@
-# DuckStock Frontend (StockFlow UI)
+# StockFlow Frontend
 
-React + Vite UI for DuckStock, focused on production planning and inventory management.
+React + Vite UI for StockFlow, focused on production planning and inventory management.
 
 ## Tech Stack
 

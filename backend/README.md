@@ -1,6 +1,6 @@
-# DuckStock Backend
+# StockFlow Backend
 
-Quarkus REST API for DuckStock (Manufacturing Production Planner). Provides authentication, inventory management (raw materials + products), and production suggestion logic.
+Quarkus REST API for StockFlow (Manufacturing Production Planner). Provides authentication, inventory management (raw materials + products), and production suggestion logic.
 
 ## Tech Stack
 
@@ -44,7 +44,7 @@ docker compose up -d
 Defaults:
 
 - Postgres port: `5432`
-- Database/user/password: `duckstock` / `duckstock` / `duckstock123`
+- Database/user/password: `stockflow` / `stockflow` / `stockflow123`
 
 ## Running (Development)
 
@@ -92,9 +92,9 @@ The application uses the following environment variables (defaults shown):
 
 - `POSTGRES_HOST` (default: `localhost`)
 - `POSTGRES_PORT` (default: `5432`)
-- `POSTGRES_DB` (default: `duckstock`)
-- `POSTGRES_USER` (default: `duckstock`)
-- `POSTGRES_PASSWORD` (default: `duckstock123`)
+- `POSTGRES_DB` (default: `stockflow`)
+- `POSTGRES_USER` (default: `stockflow`)
+- `POSTGRES_PASSWORD` (default: `stockflow123`)
 
 Hibernate generation strategy:
 
@@ -155,6 +155,11 @@ This runs only in the `dev` profile.
 2. **Admin endpoint**
 
 - `POST /admin/seed` (requires `ADMIN` role)
+
+When the seed runs via `POST /admin/seed` (it calls `SeedService.seed()`), it creates these default users:
+
+- **Admin**: `admin@stockflow.com` / `admin123`
+- **User**: `user@stockflow.com` / `user123`
 
 ## API Endpoints (Summary)
 

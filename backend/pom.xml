@@ -9,8 +9,8 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>DuckStock Backend</name>
-    <description>Manufacturing Production Planner - Backend API</description>
+    <name>StockFlow Backend</name>
+    <description>Manufacturing Production Planner - Backend API (StockFlow)</description>
 
     <properties>
         <compiler-plugin.version>3.12.1</compiler-plugin.version>

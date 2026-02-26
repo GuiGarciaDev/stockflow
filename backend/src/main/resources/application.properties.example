@@ -1,15 +1,15 @@
 # Application
-quarkus.application.name=duckstock-backend
+quarkus.application.name=stockflow-backend
 
 # Database
 # Use environment variables for sensitive data or local development
 quarkus.datasource.db-kind=postgresql
 %dev.quarkus.datasource.username=${POSTGRES_USER:your_user}
 %dev.quarkus.datasource.password=${POSTGRES_PASSWORD:your_password}
-%dev.quarkus.datasource.jdbc.url=jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:duckstock}
+%dev.quarkus.datasource.jdbc.url=jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:stockflow}
 %prod.quarkus.datasource.username=${POSTGRES_USER:your_user}
 %prod.quarkus.datasource.password=${POSTGRES_PASSWORD:your_password}
-%prod.quarkus.datasource.jdbc.url=jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:duckstock}
+%prod.quarkus.datasource.jdbc.url=jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:stockflow}
 
 # Hibernate
 %dev.quarkus.hibernate-orm.database.generation=drop-and-create
@@ -19,11 +19,11 @@ quarkus.hibernate-orm.log.sql=false
 
 # JWT
 mp.jwt.verify.publickey.location=publicKey.pem
-mp.jwt.verify.issuer=duckstock
+mp.jwt.verify.issuer=stockflow
 smallrye.jwt.sign.key.location=privateKey.pem
 smallrye.jwt.new-token.lifespan=${JWT_ACCESS_EXPIRATION:900}
 smallrye.jwt.refresh-token.lifespan=${JWT_REFRESH_EXPIRATION:604800}
-smallrye.jwt.new-token.issuer=duckstock
+smallrye.jwt.new-token.issuer=stockflow
 
 # CORS
 quarkus.http.cors=true
@@ -34,7 +34,7 @@ quarkus.http.cors.exposed-headers=Set-Cookie
 quarkus.http.cors.access-control-allow-credentials=true
 
 # OpenAPI / Swagger
-quarkus.smallrye-openapi.info-title=DuckStock API
+quarkus.smallrye-openapi.info-title=StockFlow API
 quarkus.smallrye-openapi.info-version=1.0.0
 quarkus.smallrye-openapi.info-description=Manufacturing Production Planner API
 quarkus.swagger-ui.always-include=true

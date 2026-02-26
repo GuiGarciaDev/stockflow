@@ -1,6 +1,6 @@
-# DuckStock
+# StockFlow
 
-DuckStock is a Manufacturing Production Planner: manage raw materials, build product compositions (BOM), and generate production suggestions based on current inventory.
+StockFlow is a Manufacturing Production Planner: manage raw materials, build product compositions (BOM), and generate production suggestions based on current inventory.
 
 ## What you get
 
@@ -40,6 +40,11 @@ cd backend
 copy .env.example .env
 docker compose up -d
 ```
+
+Seeded default credentials (if you run the seed endpoint `POST /admin/seed`):
+
+- Admin: `admin@stockflow.com` / `admin123`
+- User: `user@stockflow.com` / `user123`
 
 ### 2) Run the backend (dev profile)
 
