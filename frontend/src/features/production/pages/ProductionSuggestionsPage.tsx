@@ -1,14 +1,33 @@
-import { useMemo, useState } from "react"
-import { useQuery } from "@tanstack/react-query"
+import { useMemo, useRef, useState } from "react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { AnimatePresence, motion } from "framer-motion"
 import { Icon } from "@iconify/react"
+
+import { useAppSelector } from "@/app/hooks"
+import { selectAuth } from "@/features/auth/authSlice"
+import { apiErrorMessage } from "@/services/errors"
+import toast from "react-hot-toast"
 
 import { Skeleton } from "@/components/ui/Skeleton"
 import { productionService } from "@/services/productionService"
 import { productService } from "@/services/productService"
 
 export default function ProductionSuggestionsPage() {
+  const qc = useQueryClient()
+  const auth = useAppSelector(selectAuth)
+  const isAdmin = auth.user?.role === "ADMIN"
+
+  const createMinLoadingMs = 600
+  const createLoadingTimeoutRef = useRef<number | null>(null)
+
   const [expandedProductId, setExpandedProductId] = useState<string | null>(
+    null,
+  )
+
+  const [qtyByProductId, setQtyByProductId] = useState<Record<string, string>>(
+    {},
+  )
+  const [creatingProductId, setCreatingProductId] = useState<string | null>(
     null,
   )
 
@@ -33,6 +52,60 @@ export default function ProductionSuggestionsPage() {
       ? expandedProductQuery.data
       : undefined
   const expandedMaterials = expandedProduct?.rawMaterials ?? []
+
+  const createMutation = useMutation({
+    mutationFn: ({
+      productId,
+      quantity,
+    }: {
+      productId: string
+      quantity: number
+    }) => productionService.create({ productId, quantity }),
+    onMutate: async ({ productId }) => {
+      if (createLoadingTimeoutRef.current != null) {
+        window.clearTimeout(createLoadingTimeoutRef.current)
+        createLoadingTimeoutRef.current = null
+      }
+
+      setCreatingProductId(productId)
+      return { startedAt: Date.now(), productId }
+    },
+    onSuccess: async (_data, variables) => {
+      await qc.invalidateQueries({ queryKey: ["production", "suggestions"] })
+      await qc.invalidateQueries({ queryKey: ["product", variables.productId] })
+    },
+    onError: (err) => {
+      toast.error(apiErrorMessage(err) ?? "Create failed", {
+        id: "production-create-failed",
+      })
+    },
+    onSettled: (_data, _err, _variables, context) => {
+      const startedAt = context?.startedAt ?? Date.now()
+      const productId = context?.productId
+      const elapsed = Date.now() - startedAt
+      const remaining = Math.max(0, createMinLoadingMs - elapsed)
+
+      createLoadingTimeoutRef.current = window.setTimeout(() => {
+        setCreatingProductId((prev) => (prev === productId ? null : prev))
+        createLoadingTimeoutRef.current = null
+      }, remaining)
+    },
+  })
+
+  function formatMoney(value: number) {
+    const raw = new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value)
+
+    // Convert 180,040.99 -> 180.040.99
+    return raw.replaceAll(",", ".")
+  }
+
+  function parsePositiveInt(value: string) {
+    const n = Number.parseInt(value, 10)
+    return Number.isFinite(n) && n > 0 ? n : null
+  }
 
   return (
     <motion.div
@@ -59,7 +132,7 @@ export default function ProductionSuggestionsPage() {
               <Skeleton className="h-10 w-40 bg-white/10" />
             ) : (
               <div className="text-4xl font-bold tracking-tighter">
-                ${grandTotal.toFixed(2)}
+                ${formatMoney(grandTotal)}
               </div>
             )}
           </div>
@@ -82,11 +155,11 @@ export default function ProductionSuggestionsPage() {
 
         <div className="glass-card rounded-[2rem] overflow-hidden">
           <div className="hidden md:grid grid-cols-12 gap-4 px-8 py-5 bg-white/[0.02] border-b border-white/5 text-neutral-500 uppercase text-[10px] font-bold tracking-[0.15em]">
-            <div className="col-span-5">Product</div>
+            <div className="col-span-4">Product</div>
             <div className="col-span-2">Qty Possible</div>
             <div className="col-span-2">Unit Price</div>
             <div className="col-span-2">Total Value</div>
-            <div className="col-span-1 text-right">Details</div>
+            <div className="col-span-2 text-right">Create</div>
           </div>
 
           <div className="divide-y divide-white/[0.03]">
@@ -116,6 +189,16 @@ export default function ProductionSuggestionsPage() {
                     expanded && expandedProductQuery.isLoading
                   const detailsError = expanded && expandedProductQuery.isError
 
+                  const qtyRaw =
+                    qtyByProductId[p.productId] ?? String(p.quantityPossible)
+                  const qtyParsed = parsePositiveInt(qtyRaw)
+                  const rowCreating = creatingProductId === p.productId
+                  const createDisabled =
+                    !isAdmin ||
+                    rowCreating ||
+                    qtyParsed == null ||
+                    qtyParsed <= 0
+
                   return (
                     <motion.div
                       key={p.productId}
@@ -127,7 +210,7 @@ export default function ProductionSuggestionsPage() {
                       layout
                     >
                       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                        <div className="col-span-12 md:col-span-5 flex items-center gap-4">
+                        <div className="col-span-12 md:col-span-4 flex items-center gap-4">
                           <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
                             <Icon
                               icon="lucide:layers"
@@ -155,38 +238,109 @@ export default function ProductionSuggestionsPage() {
                           <span className="md:hidden text-[10px] text-neutral-500 font-bold uppercase mr-2">
                             Unit:
                           </span>
-                          ${Number(p.unitPrice).toFixed(2)}
+                          ${formatMoney(Number(p.unitPrice))}
                         </div>
 
                         <div className="col-span-6 md:col-span-2 text-sm font-semibold">
                           <span className="md:hidden text-[10px] text-neutral-500 font-bold uppercase mr-2">
                             Total:
                           </span>
-                          ${Number(p.totalValue).toFixed(2)}
+                          ${formatMoney(Number(p.totalValue))}
                         </div>
 
-                        <div className="col-span-6 md:col-span-1 flex justify-end">
-                          <button
-                            type="button"
-                            className="inline-flex items-center justify-center w-10 h-10 rounded-xl border border-white/5 text-neutral-400 hover:text-white hover:bg-white/10 transition-all"
-                            onClick={() => {
-                              setExpandedProductId((prev) =>
-                                prev === p.productId ? null : p.productId,
-                              )
-                            }}
-                            aria-label={
-                              expanded ? "Collapse details" : "Expand details"
-                            }
-                          >
-                            <Icon
-                              icon="lucide:chevron-down"
-                              className={
-                                expanded
-                                  ? "transition-transform duration-200 rotate-180"
-                                  : "transition-transform duration-200"
+                        <div className="col-span-12 md:col-span-2 flex justify-end">
+                          <div className="flex items-center justify-end gap-1 lg:gap-2">
+                            <div className="flex items-center gap-2">
+                              <span className="md:hidden text-[10px] text-neutral-500 font-bold uppercase">
+                                Create
+                              </span>
+                              <input
+                                type="number"
+                                step="1"
+                                min={1}
+                                className={[
+                                  "w-16 lg:w-20 px-3 py-2 rounded-lg bg-black/40 border text-xs text-white outline-none",
+                                  isAdmin
+                                    ? "border-white/10 focus:border-emerald-500"
+                                    : "border-white/10 opacity-60 cursor-not-allowed",
+                                ].join(" ")}
+                                value={qtyRaw}
+                                onChange={(e) =>
+                                  setQtyByProductId((prev) => ({
+                                    ...prev,
+                                    [p.productId]: e.target.value,
+                                  }))
+                                }
+                                disabled={!isAdmin || rowCreating}
+                                aria-label="Quantity to create"
+                              />
+                            </div>
+
+                            <span title={!isAdmin ? "Admin-only feature" : ""}>
+                              <button
+                                type="button"
+                                className={[
+                                  "px-2.5 h-10 rounded-xl bg-emerald-500 text-black text-xs font-bold hover:bg-emerald-400 transition-all active:scale-[0.98] inline-flex items-center gap-2",
+                                  createDisabled
+                                    ? "opacity-60 cursor-not-allowed"
+                                    : "",
+                                ].join(" ")}
+                                onClick={() => {
+                                  if (createDisabled) return
+                                  const quantity = qtyParsed ?? 0
+                                  createMutation.mutate({
+                                    productId: p.productId,
+                                    quantity,
+                                  })
+                                }}
+                                disabled={createDisabled}
+                              >
+                                {rowCreating ? (
+                                  <>
+                                    <Icon
+                                      icon="lucide:loader-2"
+                                      className="text-base animate-spin"
+                                    />
+                                    <span className="hidden xl:inline">
+                                      Creating
+                                    </span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Icon
+                                      icon="lucide:factory"
+                                      className="text-base"
+                                    />
+                                    <span className="hidden xl:inline">
+                                      Create
+                                    </span>
+                                  </>
+                                )}
+                              </button>
+                            </span>
+
+                            <button
+                              type="button"
+                              className="inline-flex items-center justify-center w-10 h-10 rounded-xl border border-white/5 text-neutral-400 hover:text-white hover:bg-white/10 transition-all"
+                              onClick={() => {
+                                setExpandedProductId((prev) =>
+                                  prev === p.productId ? null : p.productId,
+                                )
+                              }}
+                              aria-label={
+                                expanded ? "Collapse details" : "Expand details"
                               }
-                            />
-                          </button>
+                            >
+                              <Icon
+                                icon="lucide:chevron-down"
+                                className={
+                                  expanded
+                                    ? "transition-transform duration-200 rotate-180"
+                                    : "transition-transform duration-200"
+                                }
+                              />
+                            </button>
+                          </div>
                         </div>
                       </div>
 
@@ -259,13 +413,33 @@ export default function ProductionSuggestionsPage() {
                                             Per unit
                                           </p>
                                         </div>
-                                        <div className="text-right">
-                                          <p className="text-sm font-bold text-emerald-500">
-                                            {rm.quantityNeeded}
-                                          </p>
-                                          <p className="text-[10px] text-neutral-500 uppercase tracking-widest">
-                                            qty
-                                          </p>
+
+                                        <div className="flex space-x-8">
+                                          <div className="text-right">
+                                            <div className="flex flex-col items-end">
+                                              <p className="text-sm font-bold text-emerald-500">
+                                                {rm.quantityNeeded}
+                                              </p>
+                                              <p className="text-[10px] text-neutral-500 uppercase tracking-widest">
+                                                required
+                                              </p>
+                                            </div>
+                                          </div>
+
+                                          <div className="text-right">
+                                            <div className="flex flex-col items-end">
+                                              <p className="text-sm font-bold text-neutral-200">
+                                                {rm.rawMaterialStockQuantity ??
+                                                  0}{" "}
+                                                <span className="text-neutral-500 font-semibold">
+                                                  {rm.rawMaterialUnit ?? ""}
+                                                </span>
+                                              </p>
+                                              <p className="text-[10px] text-neutral-500 uppercase tracking-widest">
+                                                in stock
+                                              </p>
+                                            </div>
+                                          </div>
                                         </div>
                                       </div>
                                     ))}

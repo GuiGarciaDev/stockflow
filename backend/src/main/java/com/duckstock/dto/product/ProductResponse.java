@@ -1,11 +1,12 @@
 package com.duckstock.dto.product;
 
-import com.duckstock.entity.Product;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
+
+import com.duckstock.entity.Product;
 
 public class ProductResponse {
 
@@ -38,6 +39,8 @@ public class ProductResponse {
                         assoc.rawMaterialId = prm.rawMaterial.id;
                         assoc.rawMaterialName = prm.rawMaterial.name;
                         assoc.quantityNeeded = prm.quantityNeeded;
+                        assoc.rawMaterialStockQuantity = prm.rawMaterial.stockQuantity;
+                        assoc.rawMaterialUnit = prm.rawMaterial.unit;
                         return assoc;
                     })
                     .collect(Collectors.toList());
@@ -51,5 +54,7 @@ public class ProductResponse {
         public UUID rawMaterialId;
         public String rawMaterialName;
         public Integer quantityNeeded;
+        public Integer rawMaterialStockQuantity;
+        public String rawMaterialUnit;
     }
 }

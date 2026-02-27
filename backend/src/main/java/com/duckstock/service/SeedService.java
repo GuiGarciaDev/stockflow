@@ -68,31 +68,12 @@ public class SeedService {
     private static final String[] UNITS = {"un", "m", "m²", "kg", "L", "pç"};
 
     @Transactional
-    public Map<String, Object> seed() {
-        return seedWithUsers(
-            "admin@stockflow.com",
-            "admin123",
-            "user@stockflow.com",
-            "user123"
-        );
-        }
-
-        @Transactional
-        public Map<String, Object> seedWithAdmin(String adminEmail, String adminPassword) {
-        return seedWithUsers(
-            adminEmail,
-            adminPassword,
-            "user@stockflow.com",
-            "user123"
-        );
-        }
-
-        private Map<String, Object> seedWithUsers(
+    public Map<String, Object> seed(
             String adminEmail,
             String adminPassword,
             String userEmail,
             String userPassword
-        ) {
+    ) {
         LOG.info("Starting database seed...");
 
         // Clear existing data

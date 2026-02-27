@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import com.duckstock.dto.auth.RegisterRequest;
 import com.duckstock.dto.product.ProductRawMaterialRequest;
 import com.duckstock.dto.product.ProductRequest;
 import com.duckstock.dto.rawmaterial.RawMaterialRequest;
@@ -87,27 +86,28 @@ public class ProductionResourceTest {
     @Test
     @Order(2)
     @TestSecurity(user = "admin", roles = "ADMIN")
-    public void testConfirmProduction() {
-        // Confirm production (admin only, but the security filter is being tested separately)
-        // For now, let's just test the logic if it's reachable or if we need a token
+    public void testCreateProduction() {
+        // Pick a product from suggestions and create 1 unit.
+        String productId = given()
+                .when()
+                .get("/production/suggestions")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("products[0].productId");
 
-        // Registration and Login to get ADMIN token
-        RegisterRequest reg = new RegisterRequest();
-        reg.name = "Admin";
-        reg.email = "admin-test@duckstock.com";
-        reg.password = "admin123";
-        // We can't set role via register, so we'd need to seed or fix role in DB.
-        // However, the AuthService has a "USER" default.
-        // Let's assume the test runs without strict security for now or we use a @TestSecurity
-        
-        // Actually, the CookieAuthFilter will look for a cookie.
-        // Let's just try to call it and see if it works with the logic.
-        
         given()
                 .contentType(ContentType.JSON)
+                .body(java.util.Map.of(
+                        "productId", productId,
+                        "quantity", 1
+                ))
                 .when()
-                .post("/production/confirm")
+                .post("/production/create")
                 .then()
-                .statusCode(200);
+                .statusCode(200)
+                .body("productId", org.hamcrest.Matchers.equalTo(productId))
+                .body("quantityRequested", org.hamcrest.Matchers.equalTo(1))
+                .body("quantityCreated", org.hamcrest.Matchers.equalTo(1));
     }
 }

@@ -4,8 +4,9 @@ BACKEND:
 [x] configure cors to use environment variables(frontend url, etc).
 [x] Create a config in the properties that will create a default admin user and seed the database.
 [x] Move docker-compose file from root to backend folder. This file only run the prod database.
-
-[] Modify the endpoint /production/confirm to be a endpoint that will create a new product based in their raw material quantity available(optional)
+[x] Change the README to include the pre generated admin user profile to test the application with the database seeded. (email/pass: test@gmail.com / 123456)
+[x] Modify the endpoint /production/confirm to be a endpoint that will create a new product based in their raw material quantity available(optional)
+[x] Remove production/confirm endpoint (deprecated) in swagger docs
 
 [] unit tests for service layer.
 [] Study about the improvements of implementing a cache layer in some routes(optional)
@@ -39,6 +40,7 @@ FRONTEND:
 [x] Include the default admin credentials in readme.md in case of seed(for tests).
 [x] Make the new batch button useful
 [x] Change the name of the project to stockflow instead of duckstock
+[x] Format the currencies inputs with currency format in production page.
 
 [] Add unit tests.
 [] Add cypress integration tests.

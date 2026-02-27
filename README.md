@@ -11,6 +11,7 @@ StockFlow is a Manufacturing Production Planner: manage raw materials, build pro
 - **Swagger UI** for API exploration
 
 ## Screenshots
+
 <img width="1900" height="880" alt="image" src="https://github.com/user-attachments/assets/35c6885f-dbee-4b61-8ae2-d2313cd197fd" />
 
 <img width="1900" height="876" alt="image" src="https://github.com/user-attachments/assets/0a2996f4-5bb1-490f-99ed-fca1c729fc84" />
@@ -41,16 +42,43 @@ copy .env.example .env
 docker compose up -d
 ```
 
-Seeded default credentials (if you run the seed endpoint `POST /admin/seed`):
+Dev database seeding is **opt-in**.
 
-- Admin: `admin@stockflow.com` / `admin123`
-- User: `user@stockflow.com` / `user123`
+- Default (dev): **no data / no users**
+- With seed enabled (dev): seeds products + raw materials and creates users:
+  - Admin: `admin@stockflow.com` / `admin123`
+  - User: `user@stockflow.com` / `user123`
 
 ### 2) Run the backend (dev profile)
 
 ```bash
 cd backend
 ./mvnw.cmd quarkus:dev
+```
+
+To start with seeded data (dev only), enable the flag before running:
+
+Option A: edit the config directly (recommended for local dev)
+
+In `backend/src/main/resources/application.properties`, set:
+
+```properties
+%dev.duckstock.seed.enabled=true
+```
+
+Option B: enable via environment variable
+
+PowerShell:
+
+```powershell
+$env:DUCKSTOCK_SEED_ENABLED="true"
+./mvnw.cmd quarkus:dev
+```
+
+Or via JVM system property:
+
+```bash
+./mvnw.cmd quarkus:dev -Dduckstock.seed.enabled=true
 ```
 
 Backend: `http://localhost:8080`

@@ -6,6 +6,8 @@ export type ProductRawMaterialAssociation = {
   rawMaterialId: string
   rawMaterialName: string
   quantityNeeded: number
+  rawMaterialStockQuantity?: number
+  rawMaterialUnit?: string
 }
 
 export type Product = {

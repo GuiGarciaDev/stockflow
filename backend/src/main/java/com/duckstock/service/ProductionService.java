@@ -1,18 +1,23 @@
 package com.duckstock.service;
 
-import com.duckstock.dto.production.ProductionResponse;
-import com.duckstock.dto.production.ProductionSuggestion;
-import com.duckstock.entity.Product;
-import com.duckstock.entity.ProductRawMaterial;
-import io.quarkus.panache.common.Sort;
-import jakarta.enterprise.context.ApplicationScoped;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import com.duckstock.dto.production.ProductionCreateRequest;
+import com.duckstock.dto.production.ProductionCreateResponse;
+import com.duckstock.dto.production.ProductionResponse;
+import com.duckstock.dto.production.ProductionSuggestion;
+import com.duckstock.entity.Product;
+import com.duckstock.entity.ProductRawMaterial;
+import com.duckstock.exception.BusinessException;
+import com.duckstock.exception.ResourceNotFoundException;
+
+import io.quarkus.panache.common.Sort;
+import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class ProductionService {
@@ -80,41 +85,69 @@ public class ProductionService {
     }
 
     /**
-     * Confirm production: actually deduct stock from raw materials
+     * Create product units: deduct raw materials and add to product stock.
+     *
+     * Admin-only endpoint will call this.
      */
     @jakarta.transaction.Transactional
-    public ProductionResponse confirmProduction() {
-        ProductionResponse suggestions = getSuggestions();
-
-        // Now actually deduct stock
-        List<Product> products = Product.findAll(Sort.descending("price")).list();
-        Map<UUID, Integer> deductions = new HashMap<>();
-
-        for (ProductionSuggestion suggestion : suggestions.products) {
-            Product product = products.stream()
-                    .filter(p -> p.id.equals(suggestion.productId))
-                    .findFirst()
-                    .orElse(null);
-
-            if (product == null || product.rawMaterials == null) continue;
-
-            for (ProductRawMaterial prm : product.rawMaterials) {
-                deductions.merge(prm.rawMaterial.id,
-                        prm.quantityNeeded * suggestion.quantityPossible,
-                        Integer::sum);
-            }
+    public ProductionCreateResponse createProduct(ProductionCreateRequest request) {
+        if (request == null) {
+            throw new BusinessException("Request body is required");
+        }
+        if (request.productId == null) {
+            throw new BusinessException("Product ID is required");
+        }
+        if (request.quantity <= 0) {
+            throw new BusinessException("Quantity must be at least 1");
         }
 
-        // Apply deductions
-        for (Map.Entry<UUID, Integer> entry : deductions.entrySet()) {
-            com.duckstock.entity.RawMaterial rm =
-                    com.duckstock.entity.RawMaterial.findById(entry.getKey());
-            if (rm != null) {
-                rm.stockQuantity = Math.max(0, rm.stockQuantity - entry.getValue());
-                rm.persist();
-            }
+        Product product = Product.findById(request.productId);
+        if (product == null) {
+            throw new ResourceNotFoundException("Product not found");
         }
 
-        return suggestions;
+        List<ProductRawMaterial> rawMaterials = ProductRawMaterial.findByProduct(product);
+        if (rawMaterials == null || rawMaterials.isEmpty()) {
+            throw new BusinessException("This product has no raw materials linked");
+        }
+
+        int maxQuantityPossible = Integer.MAX_VALUE;
+        for (ProductRawMaterial prm : rawMaterials) {
+            int neededPerUnit = prm.quantityNeeded;
+            if (neededPerUnit <= 0) {
+                throw new BusinessException("Invalid product composition: quantityNeeded must be at least 1");
+            }
+
+            int possibleFromThis = prm.rawMaterial.stockQuantity / neededPerUnit;
+            maxQuantityPossible = Math.min(maxQuantityPossible, possibleFromThis);
+        }
+
+        if (maxQuantityPossible <= 0 || maxQuantityPossible == Integer.MAX_VALUE) {
+            throw new BusinessException("Insufficient raw materials to produce this product");
+        }
+
+        int quantityToProduce = Math.min(request.quantity, maxQuantityPossible);
+        if (quantityToProduce <= 0) {
+            throw new BusinessException("Nothing to produce");
+        }
+
+        // Deduct raw materials
+        for (ProductRawMaterial prm : rawMaterials) {
+            int deduction = prm.quantityNeeded * quantityToProduce;
+            prm.rawMaterial.stockQuantity = Math.max(0, prm.rawMaterial.stockQuantity - deduction);
+            prm.rawMaterial.persist();
+        }
+
+        // Increase product stock
+        product.stockQuantity = product.stockQuantity + quantityToProduce;
+        product.persist();
+
+        return new ProductionCreateResponse(
+                product.id,
+                request.quantity,
+                quantityToProduce,
+                maxQuantityPossible,
+                product.stockQuantity
+        );
     }
 }

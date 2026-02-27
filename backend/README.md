@@ -140,26 +140,30 @@ Global (in-memory) rate limiting is enabled by default:
 
 ## Seeding
 
-Two options:
+Seeding is **dev-only** and **opt-in**.
 
-1. **Dev-only automatic seed on startup** (recommended for local dev)
+- Default (dev): **no data / no users**
+- With seed enabled (dev): clears and seeds products + raw materials and creates users:
+  - **Admin**: `admin@stockflow.com` / `admin123`
+  - **User**: `user@stockflow.com` / `user123`
 
-Set in `application.properties` (dev profile):
+Enable it via environment variables:
 
-- `DEV_BOOTSTRAP_ENABLED=true`
-- `DEV_BOOTSTRAP_ADMIN_EMAIL=...`
-- `DEV_BOOTSTRAP_ADMIN_PASSWORD=...`
+- `DUCKSTOCK_SEED_ENABLED=true`
+- `DUCKSTOCK_SEED_ADMIN_EMAIL` (default: `admin@stockflow.com`)
+- `DUCKSTOCK_SEED_ADMIN_PASSWORD` (default: `admin123`)
+- `DUCKSTOCK_SEED_USER_EMAIL` (default: `user@stockflow.com`)
+- `DUCKSTOCK_SEED_USER_PASSWORD` (default: `user123`)
 
-This runs only in the `dev` profile.
+Or via JVM system properties:
 
-2. **Admin endpoint**
+- `-Dduckstock.seed.enabled=true`
 
-- `POST /admin/seed` (requires `ADMIN` role)
+Or configure it directly in `src/main/resources/application.properties`:
 
-When the seed runs via `POST /admin/seed` (it calls `SeedService.seed()`), it creates these default users:
-
-- **Admin**: `admin@stockflow.com` / `admin123`
-- **User**: `user@stockflow.com` / `user123`
+```properties
+%dev.duckstock.seed.enabled=true
+```
 
 ## API Endpoints (Summary)
 
