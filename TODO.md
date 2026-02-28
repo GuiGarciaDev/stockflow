@@ -7,8 +7,8 @@ BACKEND:
 [x] Change the README to include the pre generated admin user profile to test the application with the database seeded. (email/pass: test@gmail.com / 123456)
 [x] Modify the endpoint /production/confirm to be a endpoint that will create a new product based in their raw material quantity available(optional)
 [x] Remove production/confirm endpoint (deprecated) in swagger docs
+[x] Unit tests for service layer.
 
-[] unit tests for service layer.
 [] Study about the improvements of implementing a cache layer in some routes(optional)
 [] deploy to production(optional)
 
